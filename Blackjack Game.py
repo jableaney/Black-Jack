@@ -185,6 +185,7 @@ def player_turn(player):
                     print(hand.cards)
                     print("Bust")
                     hand.completed = True
+                    hand.resolve = True
 
     return
 
