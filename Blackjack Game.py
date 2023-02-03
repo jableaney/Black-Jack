@@ -9,6 +9,8 @@ DECKS = 6
 CARD_VALUES = {"2":2, "3":3, "4":4, "5":5, "6":6, "7":7, "8":8, "9":9, "10":10, "J":10, "Q":10, "K":10, "A":11}
 COUNT_VALUES = {"2":1, "3":1, "4":1, "5":1, "6":1, "7":0, "8":0, "9":0, "10":-1, "J":-1, "Q":-1, "K":-1, "A":-1}
 
+# Todo Incorporate global variables as class attributes
+
 shoe = []
 players = []
 cut = 0
@@ -31,6 +33,7 @@ class Player:
         self.resolved = False
 
 
+
 class Hand:
     def __init__(self):
         self.cards = []
@@ -40,6 +43,7 @@ class Hand:
         self.resolved = False
         self.completed = False
 
+# Todo - Initialize dealer.hand as a Hand object to utilize Hand methods
 
 class Dealer:
     def __init__(self):
@@ -49,6 +53,8 @@ class Dealer:
         self.hand_type = None
         self.hand_value = 0
 
+
+# Todo - implement read_hand function as a method in the Hand class
 
 def read_hand(hand):
     value = CARD_VALUES[hand[0]] + CARD_VALUES[hand[1]]
@@ -64,6 +70,7 @@ def read_hand(hand):
 
     return hand_type, value
 
+# Todo - Implement update_hand function as a method in the Hand class
 
 def update_hand(hand):
     card = deal_card()
@@ -130,8 +137,6 @@ def player_turn(player):
                     print("Please enter a valid action.")
                     print("")
 
-            print("")
-
             # Split
             if action == 4:
                 new_hand = Hand()
@@ -186,6 +191,8 @@ def player_turn(player):
                     print("Bust")
                     hand.completed = True
                     hand.resolve = True
+
+            print("")
 
     return
 
@@ -376,6 +383,7 @@ def play_hand(players, dealer):
             response = input(f"{p.name}: Insufficient funds. Would you like to deposit more money? (y/n): ")
             if response == "y":
                 p.balance += deposit()
+                print("")
             elif response == "n":
                 print("Thank you for playing.")
                 print("")
