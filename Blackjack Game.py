@@ -23,15 +23,27 @@ running_count = 0
 
 
 class Player:
-    def __init__(self, name, balance=None):
+    def __init__(self, name):
         self.name = name
-        self.balance = balance
+        self.balance = 0
         self.hands = []
         self.hand_type = None
         self.hand_value = 0
         self.bet = None
         self.resolved = False
 
+    def deposit(self):
+        while True:
+            amount = input("How much would you like to deposit? $")
+            if amount.isdigit():
+                amount = int(amount)
+                if self.balance + amount >= MIN_BET:
+                    self.balance += amount
+                    break
+                else:
+                    print(f"Amount must be at least {MIN_BET - self.balance}.")
+            else:
+                print("Please enter a valid number.")
 
 
 class Hand:
@@ -193,21 +205,6 @@ def player_turn(player):
     return
 
 
-def deposit():
-    while True:
-        amount = input("How much would you like to deposit? $")
-        if amount.isdigit():
-            amount = int(amount)
-            if amount > 0:
-                break
-            else:
-                print("Amount must be greater than 0.")
-        else:
-            print("Please enter a valid number.")
-
-    return amount
-
-
 def get_number_of_player():
     while True:
         num_players = input("Enter the number of players (1-" + str(MAX_PLAYERS) + ")? ")
@@ -306,7 +303,6 @@ def resolve_blackjack(players, dealer):
 
     return
 
-# Todo - put loop in outer scope?
 
 def resolve_hands(players, dealer):
     for p in players:
@@ -359,7 +355,8 @@ def play_hand(players, dealer):
         while p.balance < MIN_BET:
             response = input(f"{p.name}: Insufficient funds. Would you like to deposit more money? (y/n): ")
             if response == "y":
-                p.balance += deposit()
+                p.deposit()
+#                p.balance += deposit()
                 print("")
             elif response == "n":
                 print("Thank you for playing.")
@@ -423,6 +420,8 @@ def play_hand(players, dealer):
             if not hand.resolved:
                 dealer.turn()
                 break
+            else:
+                print(f"Dealer has: {dealer.hand.cards}")
 
     print("")
 
@@ -439,7 +438,9 @@ def main():
 
     for i in range(num_players):
         name = input(f"Enter player {i+1}'s name: ")
-        players.append(Player(name, deposit()))
+        player = Player(name)
+        player.deposit()
+        players.append(player)
 
     print("")
 
@@ -451,6 +452,8 @@ def main():
             if len(players) == 0:
                 break
             play_hand(players, dealer)
+        if len(players) == 0:
+            break
         response = input("Would you like to keep playing (y/n)? ")
         if response == 'n':
             print("")
