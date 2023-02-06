@@ -144,8 +144,6 @@ def player_turn(player):
                 hand.cards.append(deal_card())
                 new_hand.cards.append(deal_card())
 
-#                hand.type, hand.value = read_hand(hand.cards)
-#                new_hand.type, new_hand.value = read_hand(new_hand.cards)
                 hand.read()
                 new_hand.read()
 
@@ -308,6 +306,7 @@ def resolve_blackjack(players, dealer):
 
     return
 
+# Todo - put loop in outer scope?
 
 def resolve_hands(players, dealer):
     for p in players:
@@ -438,7 +437,6 @@ def main():
 
     num_players = get_number_of_player()
 
-    # Create a list of players and initialize player attributes
     for i in range(num_players):
         name = input(f"Enter player {i+1}'s name: ")
         players.append(Player(name, deposit()))
