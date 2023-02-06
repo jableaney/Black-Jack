@@ -43,54 +43,48 @@ class Hand:
         self.resolved = False
         self.completed = False
 
-# Todo - Initialize dealer.hand as a Hand object to utilize Hand methods
+    def read(self):
+        self.value = CARD_VALUES[self.cards[0]] + CARD_VALUES[self.cards[1]]
+        if "A" in self.cards:
+            self.type = "Soft"
+        else:
+            self.type = "Hard"
+
+        if self.value == 21:
+            self.type = "BLACKJACK"
+        elif self.value == 22:
+            self.value = 12
+
+    def update(self):
+        card = deal_card()
+        self.cards.append(card)
+
+        if card == "A":
+            if self.value <= 10:
+                self.type = "Soft"
+                self.value += 11
+            else:
+                self.value += 1
+
+        else:
+            self.value += CARD_VALUES[card]
+
+        if self.type == "Soft" and self.value > 21:
+            self.type = "Hard"
+            self.value -= 10
+
 
 class Dealer:
     def __init__(self):
         self.name = "Dealer"
         self.balance = None
-        self.hand = []
-        self.hand_type = None
-        self.hand_value = 0
+        self.hand = Hand()
 
-
-# Todo - implement read_hand function as a method in the Hand class
-
-def read_hand(hand):
-    value = CARD_VALUES[hand[0]] + CARD_VALUES[hand[1]]
-    if "A" in hand:
-        hand_type = "Soft"
-    else:
-        hand_type = "Hard"
-
-    if value == 21:
-        hand_type = "BLACKJACK"
-    elif value == 22:
-        value = 12
-
-    return hand_type, value
-
-# Todo - Implement update_hand function as a method in the Hand class
-
-def update_hand(hand):
-    card = deal_card()
-    hand.cards.append(card)
-
-    if card == "A":
-        if hand.value <= 10:
-            hand.type = "Soft"
-            hand.value += 11
-        else:
-            hand.value += 1
-
-    else:
-        hand.value += CARD_VALUES[card]
-
-    if hand.type == "Soft" and hand.value > 21:
-        hand.type = "Hard"
-        hand.value -= 10
-
-    return
+    def turn(self):
+        print(f"Dealer has {self.hand.cards}: {self.hand.type} {self.hand.value}")
+        while self.hand.value < 17:
+            self.hand.update()
+            print(f"Dealer hits: {self.hand.cards} ({self.hand.type} {self.hand.value})")
 
 
 def build_prompt(player, hand):
@@ -150,8 +144,10 @@ def player_turn(player):
                 hand.cards.append(deal_card())
                 new_hand.cards.append(deal_card())
 
-                hand.type, hand.value = read_hand(hand.cards)
-                new_hand.type, new_hand.value = read_hand(new_hand.cards)
+#                hand.type, hand.value = read_hand(hand.cards)
+#                new_hand.type, new_hand.value = read_hand(new_hand.cards)
+                hand.read()
+                new_hand.read()
 
                 if card == "A":
                     hand.completed = True
@@ -171,7 +167,8 @@ def player_turn(player):
             elif action == 3:
                 player.balance -= hand.bet
                 hand.bet *= 2
-                update_hand(hand)
+                hand.update()
+#                update_hand(hand)
                 print(hand.cards)
                 if hand.value > 21:
                     print("Bust")
@@ -184,7 +181,8 @@ def player_turn(player):
 
             # Hit
             elif action == 1:
-                update_hand(hand)
+                hand.update()
+#                update_hand(hand)
 
                 if hand.value > 21:
                     print(hand.cards)
@@ -194,27 +192,6 @@ def player_turn(player):
 
             print("")
 
-    return
-
-
-def dealer_turn(dealer):
-    while dealer.hand_value < 17:
-        card = deal_card()
-        dealer.hand.append(card)
-        print(f"Dealer hits: {dealer.hand}")
-
-        if card == "A":
-            if dealer.hand_value <= 10:
-                dealer.hand_type = "Soft"
-                dealer.hand_value += 11
-            else:
-                dealer.hand_value += 1
-        else:
-            dealer.hand_value += CARD_VALUES[card]
-
-        if dealer.hand_type == "Soft" and dealer.hand_value > 21:
-            dealer.hand_type = "Hard"
-            dealer.hand_value -= 10
     return
 
 
@@ -275,6 +252,7 @@ def deal_card():
     running_count += COUNT_VALUES[card]
     return card
 
+# Todo get_bet() could be a player method
 
 def get_bet(player):
     while True:
@@ -296,14 +274,14 @@ def deal_hands(players, dealer):
         for p in players:
             for h in p.hands:
                 h.cards.append(deal_card())
-        dealer.hand.append(deal_card())
+        dealer.hand.cards.append(deal_card())
 
     return
 
 
 def resolve_blackjack(players, dealer):
-    if dealer.hand_type == "BLACKJACK":
-        print(f"{dealer.name} has {dealer.hand_type} {dealer.hand}")
+    if dealer.hand.type == "BLACKJACK":
+        print(f"{dealer.name} has {dealer.hand.type} ({dealer.hand.cards})")
         for p in players:
             for h in p.hands:
                 if h.type == "BLACKJACK":
@@ -336,30 +314,30 @@ def resolve_hands(players, dealer):
         for h in p.hands:
             if not h.resolved:
                 if h.value > 21:
-                    print(f"{p.name}, you have {h.value}.")
+                    print(f"{p.name} has {h.value}.")
                     print("Result: You bust.")
                     print("")
                     h.resolved = True
-                elif dealer.hand_value > 21:
-                    print(f"{p.name} has {h.value}, dealer has {dealer.hand_value}.")
+                elif dealer.hand.value > 21:
+                    print(f"{p.name} has {h.value}, dealer has {dealer.hand.value}.")
                     print(f"Result: You won!")
                     print("")
                     p.balance += 2*h.bet
                     h.resolve = True
-                elif h.value > dealer.hand_value:
-                    print(f"{p.name} has {h.value}, dealer has {dealer.hand_value}.")
+                elif h.value > dealer.hand.value:
+                    print(f"{p.name} has {h.value}, dealer has {dealer.hand.value}.")
                     print(f"Result: You won!")
                     print("")
                     p.balance += 2*h.bet
                     h.resolve = True
-                elif h.value == dealer.hand_value:
-                    print(f"{p.name} has {h.value}, dealer has {dealer.hand_value}.")
+                elif h.value == dealer.hand.value:
+                    print(f"{p.name} has {h.value}, dealer has {dealer.hand.value}.")
                     print(f"Result: Push")
                     print("")
                     p.balance += h.bet
                     h.resolve = True
                 else:
-                    print(f"{p.name} has {h.value}, dealer has {dealer.hand_value}.")
+                    print(f"{p.name} has {h.value}, dealer has {dealer.hand.value}.")
                     print(f"Result: You lost")
                     print("")
                     h.resolve = True
@@ -398,7 +376,7 @@ def play_hand(players, dealer):
     for p in players:
         p.hands = []
 
-    dealer.hand = []
+    dealer.hand = Hand()
 
     for p in players:
         hand = Hand()
@@ -423,18 +401,18 @@ def play_hand(players, dealer):
 
     deal_hands(players, dealer)
 
-    up_card = dealer.hand[1]
+    up_card = dealer.hand.cards[1]
 
     for p in players:
         for h in p.hands:
-            h.type, h.value = read_hand(h.cards)
+            h.read()
 
-    dealer.hand_type, dealer.hand_value = read_hand(dealer.hand)
+    dealer.hand.read()
 
-    # Check and resolve for Blackjack
+    # Todo - Offer insurance?
+
     resolve_blackjack(players, dealer)
 
-    # Allow each player to play their hand
     for p in players:
         for hand in p.hands:
             if not hand.completed and not hand.resolved:
@@ -443,12 +421,9 @@ def play_hand(players, dealer):
     # Check for unresolved player hands before playing dealer turn
     for p in players:
         for hand in p.hands:
-            if hand.value <= 21 and hand.type != "BLACKJACK":
-                dealer_turn(dealer)
+            if not hand.resolved:
+                dealer.turn()
                 break
-
-    if dealer.hand_type != "BLACKJACK":
-        print(f"{dealer.name} has: {dealer.hand}")
 
     print("")
 
@@ -459,13 +434,13 @@ def play_hand(players, dealer):
 
 def main():
     # Todo Ask for rules?
-    # Todo Print rules
+    # Todo Print rules?
 
     num_players = get_number_of_player()
 
     # Create a list of players and initialize player attributes
     for i in range(num_players):
-        name = input(f"Enter player{i+1}'s name: ")
+        name = input(f"Enter player {i+1}'s name: ")
         players.append(Player(name, deposit()))
 
     print("")
