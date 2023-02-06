@@ -6,8 +6,10 @@ MIN_BET = 5
 MAX_BET = 100
 
 DECKS = 6
-CARD_VALUES = {"2":2, "3":3, "4":4, "5":5, "6":6, "7":7, "8":8, "9":9, "10":10, "J":10, "Q":10, "K":10, "A":11}
-COUNT_VALUES = {"2":1, "3":1, "4":1, "5":1, "6":1, "7":0, "8":0, "9":0, "10":-1, "J":-1, "Q":-1, "K":-1, "A":-1}
+CARD_VALUES = {"2": 2, "3": 3, "4": 4, "5": 5, "6": 6, "7": 7, "8": 8, "9": 9, "10": 10, "J": 10, "Q": 10, "K": 10,
+               "A": 11}
+COUNT_VALUES = {"2": 1, "3": 1, "4": 1, "5": 1, "6": 1, "7": 0, "8": 0, "9": 0, "10": -1, "J": -1, "Q": -1, "K": -1,
+                "A": -1}
 
 # Todo Incorporate global variables as class attributes
 
@@ -106,18 +108,18 @@ def build_prompt(player, hand):
 
     valid_inputs = ["1", "2"]
 
-
     if len(hand.cards) == 2 and player.balance > hand.bet:
         prompt += "3: Double \n"
         valid_inputs.append("3")
 
         if CARD_VALUES[hand.cards[0]] == CARD_VALUES[hand.cards[1]] and len(player.hands) < 4:
-                prompt += "4: Split \n"
-                valid_inputs.append("4")
+            prompt += "4: Split \n"
+            valid_inputs.append("4")
 
     prompt += f"Enter a number from 1 to {len(valid_inputs)}: "
 
     return prompt, valid_inputs
+
 
 # Todo - organize splitting functionality properly
 # Todo - get action as separate function
@@ -246,6 +248,7 @@ def deal_card():
     card = shoe.pop(0)
     running_count += COUNT_VALUES[card]
     return card
+
 
 # Todo get_bet() could be a player method
 
@@ -467,5 +470,6 @@ def main():
         print(f"{p.name}, your final balance is: ${p.balance}")
 
     print("Thank you for playing.")
+
 
 main()
