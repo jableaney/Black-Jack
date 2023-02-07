@@ -29,10 +29,10 @@ class Player:
         self.name = name
         self.balance = 0
         self.hands = []
-        self.hand_type = None
-        self.hand_value = 0
-        self.bet = None
-        self.resolved = False
+#        self.hand_type = None
+#        self.hand_value = 0
+#        self.bet = None
+#        self.resolved = False
 
     def deposit(self):
         while True:
@@ -91,7 +91,7 @@ class Hand:
 class Dealer:
     def __init__(self):
         self.name = "Dealer"
-        self.balance = None
+#        self.balance = None
         self.hand = Hand()
 
     def turn(self):
@@ -180,10 +180,10 @@ def player_turn(player):
                 player.balance -= hand.bet
                 hand.bet *= 2
                 hand.update()
-#                update_hand(hand)
                 print(hand.cards)
                 if hand.value > 21:
                     print("Bust")
+                    hand.completed = True
                     hand.resolved = True
                 hand.completed = True
 
@@ -197,10 +197,10 @@ def player_turn(player):
 #                update_hand(hand)
 
                 if hand.value > 21:
-                    print(hand.cards)
+                    print(f"{hand.cards} {hand.type} {hand.value}")
                     print("Bust")
                     hand.completed = True
-                    hand.resolve = True
+                    hand.resolved = True
 
             print("")
 
@@ -359,7 +359,6 @@ def play_hand(players, dealer):
             response = input(f"{p.name}: Insufficient funds. Would you like to deposit more money? (y/n): ")
             if response == "y":
                 p.deposit()
-#                p.balance += deposit()
                 print("")
             elif response == "n":
                 print("Thank you for playing.")
